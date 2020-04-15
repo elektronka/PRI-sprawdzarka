@@ -1,0 +1,35 @@
+body
+{
+	margin: 0px;
+	background-color: #5284e0;
+}
+
+#footer
+{
+	text-align: center;
+
+}
+
+#container
+{
+	height: auto;
+	width: auto;
+}
+
+.top
+{
+	text-align: center;
+	float: left;
+	padding-top: 0.9%;
+    padding-bottom: 0.5%;
+    padding-left: 0.4%;
+    padding-right: 0.4%;
+	width: 99.2%;
+	background: linear-gradient(#0014ff, #00dcff);
+
+}
+
+.login-panel
+{
+	
+}
