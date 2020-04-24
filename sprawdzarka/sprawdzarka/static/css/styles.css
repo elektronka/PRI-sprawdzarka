@@ -6,7 +6,9 @@ body
 
 #footer
 {
-	text-align: center;
+	text-align: left;
+	float: left;
+
 
 }
 
@@ -29,7 +31,15 @@ body
 
 }
 
-.login-panel
+.button-panel
 {
-	
+	background: linear-gradient()
 }
+
+#logo
+{
+	float: left;
+	height: 117px;
+	width: 100px;
+}
+

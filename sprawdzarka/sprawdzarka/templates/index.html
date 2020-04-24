@@ -9,15 +9,16 @@
 <body>
 <div id="container">
 	<div class="top">
-		<img src="logo.jpg" id="logo">
+		<img src='{% static "logo.jpg" %}' id="logo">
 	</div>
 	<div class="login-panel">
 		<button class="button">Logowanie</button>
-		<button class="button">Oddawanie zadań</button>
-		<button class="button">Forum</button>
+		<a href="/task/"><button class="button">Oddawanie zadań</button></a>
+		<a href="/forum/"><button class="button">Forum</button></a>
+		<a href="/admin/"><button class="button">Admin</button></a>
 	</div>
 	<div class="main">
-		
+		<img src="logo.jpg" id="logo2">
 	</div>
 	<div id="footer">
 		

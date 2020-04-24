@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Sprawdzarka</title>
+	<link rel="stylesheet" type="text/css" href='{% static "css\styles.css" %}'>
+</head>
+<body>
+<div id="container">
+	<div class="top">
+		<img src="logo.jpg" id="logo">
+	</div>
+	<div class="login-panel">
+		<button class="button">Logowanie</button>
+		<button class="button">Oddawanie zadań</button>
+		<button class="button">Forum</button>
+	</div>
+	<div class="main">
+        <h2>Posts</h2>
+		<table class="table">
+			<thead>
+			<tr>
+				<th>title</th>
+				<th>content</th>
+				<th>date</th>
+				<th>author</th>
+			</tr>
+			<tbody>
+				{% for data in context %}
+						<td>{{data.title}}</td>
+						<td>{{data.content}}</td>
+						<td>{{data.date_posted}}</td>
+						<td>{{data.author}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+			</thead>
+		</table>
+	</div>
+	<div id="footer">
+
+	</div>
+
+</div>
+</body>
+</html>
