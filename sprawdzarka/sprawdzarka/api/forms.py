@@ -1,7 +1,15 @@
 from django import forms
-from .models import SendedTasks
+from . import models
 
 class SendedTasksForm(forms.ModelForm):
     class Meta:
-        model = SendedTasks
+        model = models.SendedTasks
         fields = ('taskid','snumber','task')
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = models.Post
+        fields = ('title','content','date_posted','author')
+
+
+

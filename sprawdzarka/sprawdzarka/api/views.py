@@ -3,8 +3,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from api import serializers
 from django.shortcuts import render, redirect
-from . import models
-from .forms import SendedTasksForm
+from . import models, forms
 from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
@@ -33,15 +32,21 @@ def task_sended_list(request):
 
 def task_sended_upload(request):
     if request.method=='POST':
-        form = SendedTasksForm(request.POST, request.FILES)
+        form = forms.SendedTasksForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
     else:
-        form=SendedTasksForm()
+        form=forms.SendedTasksForm()
     return render(request,'task_sended_upload.html', {'form': form})
 
 def forum(request):
     context = models.Post.objects.all
+    if request.method=='POST':
+        form = forms.PostForm(request.POST)
+        if form.is_valid():
+            form.save()
+    else:
+        form=forms.PostForm()
     return render(request, 'forum/forum.html', {'context': context})
 
 def signup_view(request):
@@ -50,7 +55,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request,user)
-            return redirect('articles:list')
+            return redirect('api:')
     else:
         form = UserCreationForm()
         return render(request, 'accounts/signup.html', {'form':form})
@@ -62,7 +67,7 @@ def login_view(request):
 	      #log in the user
 		    user = form.get_user()
 		    login(request,user)
-		    return redirect('articles:list')
+		    return redirect('api:forum')
     else:
         form = AuthenticationForm()
     return render(request, 'accounts/login.html', {'form':form})
@@ -70,4 +75,10 @@ def login_view(request):
 def logout_view(request):
     if request.method == 'POST':
 	    logout(request)
-	    return redirect('articles:list')
+	    return redirect('api:')
+
+def read_file(request, file_to_open):
+    f = open(r'task/SendedTasks/'+file_to_open, 'r')
+    file_content = f.read()
+    f.close()
+    return HttpResponse(file_content, content_type="text/plain")

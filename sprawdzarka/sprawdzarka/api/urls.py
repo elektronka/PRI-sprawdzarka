@@ -10,8 +10,9 @@ urlpatterns = [
     path('task/upload/',views.task_sended_upload),
     path('task/sendedList/',views.task_sended_list),
     path('task/',views.task, name='task'),
-    path('forum/',views.forum),
+    path('forum/',views.forum, name = 'forum'),
     path('signup/', views.signup_view, name="signup"),
 	path('login/',views.login_view, name="login"),
 	path('logout/', views.logout_view, name="logout"),
+    path('task/SendedTasks/<str:file_to_open>',views.read_file),
 ]
