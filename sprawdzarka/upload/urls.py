@@ -31,5 +31,6 @@ urlpatterns = [
     path('tasklist/',views.task_list, name='task-list'),
     path('tasklistupload/',views.task_List_upload, name='task-list-upload'),
     path('tasklist/<str:file_to_open>',views.read_file2, name='task-list-teacher'),
+    path('plagiat',views.plagiat, name='plagiat'),
 ]
 

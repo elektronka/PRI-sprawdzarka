@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sprawozdanie PUBLIC "sprawozdanie" "http://mhanckow.vm.wmi.amu.edu.pl:20002/zajecia/file-storage/view/sprawozdanie.dtd">
+    <sprawozdanie przedmiot="ALR" temat="A">
+        <imie_nazwisko>Adam Świnka</imie_nazwisko>
+        <nr_indeksu>434795</nr_indeksu>
+        <liczba_pkt>15</liczba_pkt>
+        <zadanie nr="-1" pkt="1"></zadanie>
+        <zadanie nr="0" pkt="1"></zadanie>
+        <zadanie nr="1" pkt="1"></zadanie>
+        <zadanie nr="1a" pkt="1"></zadanie>
+        <zadanie nr="2" pkt="1"></zadanie>
+        <zadanie nr="3" pkt="4"></zadanie>
+        <zadanie nr="4" pkt="3"></zadanie>
+        <zadanie nr="5" pkt="1"></zadanie>
+        <zadanie nr="5a" pkt="2"></zadanie>
+    </sprawozdanie>
+
+Zadanie -1 -------------------------------------
+///wydruk
+plik events04.tcl:
+0: aaaaaaaaa
+1: aaaaaaaaa
+2: aaaaaaaaa
+0: bbbbbbbbb
+1: bbbbbbbbb
+2: bbbbbbbbb
+plik events03a.tcl:
+...
+fiber switchto 0; set zm
+  #% 2 5 0
+  #% 2 1 0
+  #% 10 2 0
+  #% 2 0 1
+  #% 1 4 2
+  #% 0 2 3
+  #% 8 1 2
