@@ -1,0 +1,849 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sprawozdanie PUBLIC "sprawozdanie" "http://mhanckow.vm.wmi.amu.edu.pl:20002/zajecia/file-storage/view/sprawozdanie.dtd">
+<sprawozdanie przedmiot="ALR" temat="D">
+<imie_nazwisko>Adam Świnka</imie_nazwisko>
+<nr_indeksu>426196</nr_indeksu>
+<liczba_pkt>9</liczba_pkt>
+<zadanie nr="3" pkt="1"></zadanie>
+<zadanie nr="5" pkt="1"></zadanie>
+<zadanie nr="6" pkt="1"></zadanie>
+<zadanie nr="8" pkt="1"></zadanie>
+<zadanie nr="9" pkt="1"></zadanie>
+<zadanie nr="10" pkt="1"></zadanie>
+<zadanie nr="11" pkt="1"></zadanie>
+<zadanie nr="21" pkt="1"></zadanie>
+<zadanie nr="22" pkt="1"></zadanie>
+</sprawozdanie>
+
+Zadanie 3 -------------------------------------
+
+int licznik = 0;
+int i1 = 0;
+int i2 = 0;
+semaphore sem = 1;
+
+void proc1() {
+    while(1) {
+        wait(sem);
+        i1 = i1 + 1;
+        licznik = licznik + 1;
+        signal(sem);
+    }
+}
+
+void proc2() {
+    while(1) {
+        wait(sem);
+        i2 = i2 + 1;
+ 	    licznik = licznik + 1;
+        signal(sem);
+    }
+}
+
+void procKontr() {
+    while(1) {
+        cout << i1 + i2 << ":" << licznik << endl;
+    }
+}
+
+main() {
+    cobegin {
+        proc1();
+        proc2();
+        procKontr();
+    }
+}
+
+Zadanie 5 -------------------------------------
+
+atomic void Pokaz(string S) {
+    cout << which_proc() << ": " << S << endl;
+}
+
+const int rozmiar_buf = 1000;
+int buf[rozmiar_buf];
+int buf_czyt = 0;
+int buf_pisz = 0;
+
+void Produkuj() {
+    int el;
+    string[50] str;
+    el = random(1000);
+
+    sprintf(str, "produkuje %d; buf_pisz=%d, buf_czyt=%d", el, buf_pisz, buf_czyt);
+    Pokaz(str);
+
+    buf[buf_pisz] = el;
+    buf_pisz++;
+    if (buf_pisz >= rozmiar_buf)
+        exit(1);
+}
+
+void Konsumuj() {
+    int el;
+    string[50] str;
+    el = buf[buf_czyt];
+
+    sprintf(str, "konsumuje %d; buf_pisz = %d, buf_czyt = %d", el, buf_pisz, buf_czyt);
+    Pokaz(str);
+
+    buf_czyt++;
+    if (buf_czyt >= rozmiar_buf)
+        exit(1);
+}
+
+binarysem S;
+binarysem Zwloka;
+
+int N = 0;
+
+void Producent() {
+    int atrapa;
+
+    while(1) {
+        wait(S);
+        Produkuj();
+        if (N == 0)
+            signal(Zwloka);
+        N++;
+        signal(S);
+
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+    }
+}
+
+
+void Konsument() {
+    int atrapa;
+    string[20] str;
+
+    wait(Zwloka);
+    while(1) {
+        wait(Zwloka);
+        wait(S);
+        signal(Zwloka);
+        Konsumuj();
+        N--;
+
+        if (N == 0)
+            wait(Zwloka);
+
+        signal(S);
+
+        sprintf(str, "atrapa-poczatek; N=%d", N);
+        Pokaz(str);
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 321;
+        sprintf(str, "atrapa-koniec; N = %d", N);
+        Pokaz(str);
+    }
+}
+
+main() {
+    initialsem(S, 1);
+    initialsem(Zwloka, 0);
+
+    cobegin {
+        Konsument();
+        Producent();
+    }
+}
+
+
+Zadanie 6 -------------------------------------
+
+atomic void Pokaz(string S) {
+    cout << S << endl;
+}
+
+const int rozmiar_buf = 50;
+int buf[rozmiar_buf];
+int buf_czyt = 0;
+int buf_pisz = 0;
+int el = 0;
+
+void Produkuj() {
+    string[50] str;
+    el++;
+
+    buf[buf_pisz] = el;
+    buf_pisz++;
+
+    if (buf_pisz >= rozmiar_buf)
+        exit(1);
+}
+
+void Konsumuj(int nr) {
+    int el;
+    string[50] str;
+    el = buf[buf_czyt];
+
+    sprintf(str, "konsument %d; konsumuje %d;", nr, el);
+    Pokaz(str);
+
+    buf_czyt++;
+
+    if (buf_czyt >= rozmiar_buf)
+        exit(1);
+}
+
+binarysem S = 1;
+semaphore Wolne = 0;
+semaphore Pelne = rozmiar_buf;
+
+void Producent() {
+    int atrapa;
+
+    while(1) {
+        wait(Pelne);
+        wait(S);
+        Produkuj();
+        signal(S);
+        signal(Wolne);
+
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+    }
+}
+
+
+void Konsument(int nr) {
+    int atrapa;
+    string[20] str;
+
+    while(1) {
+        wait(Wolne);
+        wait(S);
+        Konsumuj(nr);
+        signal(S);
+        signal(Pelne);
+
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 123;
+        atrapa = 321;
+        atrapa = 321;
+    }
+}
+
+main() {
+    cobegin {
+        Konsument(1);
+        Konsument(2);
+        Producent();
+    }
+}
+
+Zadanie 8 -------------------------------------
+
+atomic void Pokaz(string S)
+{
+  cout<<which_proc()<<": "<<S<<endl;
+}
+
+
+const int rozmiar_buf=10000;
+int buf[rozmiar_buf];
+int buf_czyt=0;
+int buf_pisz=0;
+
+void Produkuj()
+{
+  int el; string[50] str;
+  el=random(10000);
+
+  sprintf(str,"produkuje %d; buf_pisz=%d, buf_czyt=%d",
+    el,buf_pisz,buf_czyt);
+  Pokaz(str);
+
+  buf[buf_pisz]=el;
+  buf_pisz++;
+  if(buf_pisz>=rozmiar_buf) exit(1);
+}
+
+void Konsumuj()
+{
+  int el; 
+  string[50] str;
+  el=buf[buf_czyt];
+
+  sprintf(str,"konsumuje %d; buf_pisz=%d, buf_czyt=%d", el, buf_pisz, buf_czyt);
+  Pokaz(str);
+
+  buf_czyt++;
+  if(buf_czyt>=rozmiar_buf) exit(1);
+}
+
+
+binarysem S;
+binarysem Zwloka;
+
+int N=0;
+
+void Producent()
+{
+  int atrapa;
+
+  while(1) {
+    wait(S);
+    Produkuj();
+    N++;
+    if( N==1 ) signal(Zwloka);
+    signal(S);
+
+    atrapa=321;
+    atrapa=321;
+    atrapa=123;
+    atrapa=321;
+    atrapa=321;
+    atrapa=321;
+    atrapa=123;
+    atrapa=321;
+    atrapa=321;
+    atrapa=321;
+    atrapa=123;
+    atrapa=321;
+    atrapa=321;
+    atrapa=321;
+    atrapa=321;
+    atrapa=321;
+    atrapa=123;
+    atrapa=321;
+  }
+}
+
+
+void Konsument()
+{
+  int atrapa; string[20] str;
+
+  wait(Zwloka);
+  while(1) {
+    wait(S);
+    Konsumuj();
+    N--;
+    signal(S);
+
+    sprintf(str,"atrapa-poczatek; N=%d",N); Pokaz(str);
+    atrapa=123;
+    atrapa=321;
+    atrapa=123;
+    atrapa=321;
+    atrapa=123;
+    atrapa=321;
+    atrapa=123;
+    atrapa=321;
+    atrapa=321;
+    sprintf(str,"atrapa-koniec; N=%d",N); Pokaz(str);
+
+    if( N==0 ) wait(Zwloka);
+  }
+}
+
+main()
+{
+  initialsem(S,1);
+  initialsem(Zwloka,0);
+
+  cobegin {
+    Konsument();
+    Producent();
+  }
+}
+
+Zadanie 9 -------------------------------------
+
+const int RozmiarCzytelni = 5;
+int IloscCzytelnikow = 0;
+int IloscPisarzy = 0;
+int wCzytelni[8];
+int wCzytelniPisarze[4];
+int ile[8];
+int ilePisarzy[4];
+binarysem I = 1;
+semaphore R = RozmiarCzytelni;
+binarysem W = 1;
+
+void Czytelnik(int nr) {
+    int atrapa;
+    while(1) {
+        wait(R);
+	    wait(I);
+        IloscCzytelnikow++;
+        ile[nr] = ile[nr] + 1;
+        wCzytelni[nr] = 1;
+        signal(I);
+
+        atrapa = 123;
+        atrapa = 123;
+        atrapa = 123;
+
+        wait(I);
+        IloscCzytelnikow--;
+        wCzytelni[nr] = 0;
+        signal(I);
+        signal(R);
+
+        atrapa = 123;
+        atrapa = 123;
+        atrapa = 123;
+    }
+}
+
+void Pisarz(int nr) {
+    int i, j, atrapa;
+
+    while(1) {
+        wait(W);
+        for(i = 1; i <= RozmiarCzytelni; i++)
+            wait(R);
+
+        wait(I);
+        IloscPisarzy++;
+        ilePisarzy[nr] = ilePisarzy[nr] + 1;
+	    wCzytelniPis[nr] = 1;
+        signal(I);
+
+        atrapa = 123;
+        atrapa = 123;
+        atrapa = 123;
+
+        wait(I);
+        IloscPisarzy--;
+    	wCzytelniPis[nr] = 0;
+        signal(I);
+
+        for(i = 1; i <= RozmiarCzytelni; i++)
+            signal(R);
+
+        signal(W);
+
+        atrapa = 123;
+        atrapa = 123;
+        atrapa = 123;
+    }
+}
+
+void _Kontrola() {
+    int atrapa;
+    while(1) {
+        if (ilePisarzy[1] > 100) {
+            cout << ilePisarzy[1] << "|" << ilePisarzy[1] << "|" << ilePisarzy[3] << "|";
+            cout << ile[1] << "|" << ile[2] << "|" << ile[3] << "|" << ile[4] << "|" << ile[5] << "|" << ile[6] << "|" << ile[7] << endl;
+	        exit(1);
+        }
+
+    	cout << wCzytelniPisarze[1] << wCzytelniPisarze[2] << wCzytelniPisarze[3] << "|";
+        cout << wCzytelni[1] << wCzytelni[2] << wCzytelni[3] << wCzytelni[4] << wCzytelni[5] << wCzytelni[6] << wCzytelni[7] << endl;
+
+        atrapa = 123;
+        atrapa = 123;
+        atrapa = 123;
+        atrapa = 123;
+        atrapa = 123;
+        atrapa = 123;
+    }
+}
+
+main() {
+    cobegin {
+        Czytelnik(1);
+        Czytelnik(2);
+        Czytelnik(3);
+        Czytelnik(4);
+        Czytelnik(5);
+        Czytelnik(6);
+        Czytelnik(7);
+
+        Pisarz(1);
+        Pisarz(2);
+    	Pisarz(3);
+
+        _Kontrola();
+    }
+}
+
+Zadanie 10 -------------------------------------
+
+int Jem[5];
+int Widelec[5];
+binarysem S = 1;
+binarysem Waiter = 1;
+
+void Filozof(int nr) {
+    while(1) {
+        wait(S);
+        wait(Waiter);
+
+        Widelec[nr] = Widelec[nr] - 1;
+	    Widelec[(nr + 1) % 5] = Widelec[(nr + 1) % 5] - 1;
+
+	    Jem[nr] = 1;
+	    signal(Waiter);
+
+        Widelec[nr] = Widelec[nr] + 1;
+	    Widelec[(nr + 1) % 5] = Widelec[(nr + 1) % 5] + 1;
+
+	    Jem[nr] = 0;
+	    signal(S);
+   }
+}
+
+void procesKontrolny() {
+    while(1) {
+        cout << Jem[0] << Jem[1] << Jem[2] << Jem[3] << Jem[4] << endl;
+    }
+}
+
+main() {
+    cobegin {
+        Filozof(0);
+        Filozof(1);
+        Filozof(2);
+        Filozof(3);
+        Filozof(4);
+
+        procesKontrolny();
+    }
+}
+
+Zadanie 11 -------------------------------------
+
+int Jem[5];
+int Widelec[5];
+binarysem S = 1;
+binarysem Waiter = 1;
+
+void Filozof(int nr) {
+    while(1) {
+        wait(S);
+        wait(Waiter);
+
+        Widelec[nr] = Widelec[nr] - 1;
+	    Widelec[(nr + 1) % 5] = Widelec[(nr + 1) % 5] - 1;
+
+	    Jem[nr] = 1;
+	    signal(Waiter);
+
+        Widelec[nr] = Widelec[nr] + 1;
+	    Widelec[(nr + 1) % 5] = Widelec[(nr + 1) % 5] + 1;
+
+	    Jem[nr] = 0;
+	    signal(S);
+   }
+}
+
+void procesKontrolny() {
+    while(1) {
+        cout << Jem[0] << Jem[1] << Jem[2] << Jem[3] << Jem[4] << endl;
+    }
+}
+
+int state = ["THINKING", "HUNGRY", "EATING"]
+int semafor = [0, 0, 0]
+void test(i)
+{
+  if( (state[i]==HUNGRY)
+  &&  (state[LEFT]!=EATING)
+  &&  (state[RIGHT]!=EATING) )
+  {
+    state[i]=EATING; signal(s[i]);
+  }
+}
+
+main() {
+    cobegin {
+        Filozof(0);
+        Filozof(1);
+        Filozof(2);
+        Filozof(3);
+        Filozof(4);
+
+        procesKontrolny();
+    }
+}
+
+Zadanie 21 -------------------------------------
+
+atomic void Pokaz(string S) {
+    cout<<which_proc() << "> " << S < <endl;
+}
+
+monitor ProducentKonsument {
+	const int rozmiar_buf = 60;
+	int buf[rozmiar_buf];
+	int buf_czyt = 0;
+	int buf_pisz = 0;
+	int N;
+
+	condition Pelne;
+	condition Puste;
+
+	void Produkuj()	{
+        int el;
+        string[50] str;
+	    el=random(1000);
+
+	    sprintf(str, "produkuje %d; buf_pisz=%d, buf_czyt = %d", el, buf_pisz, buf_czyt);
+	    Pokaz(str);
+
+        buf[buf_pisz] = elem;
+        buf_pisz++;
+        if (buf_pisz >= rozmiar_buf)
+            exit(1);
+    }
+
+    void Konsumuj() {
+        int elem;
+        string[50] str;
+        elem=buf[buf_czyt];
+
+        sprintf(str, "konsumuje %d; buf_pisz = %d, buf_czyt = %d", elem, buf_pisz,buf_czyt);
+        Pokaz(str);
+        buf_czyt++;
+
+        if (buf_czyt >= rozmiar_buf)
+            exit(1);
+	}
+
+	void dodajDoBufora() {
+        if (N == rozmiar_buf)
+            waitc(Pelne);
+
+        Produkuj();
+        N = N + 1;
+
+        if (N == 1)
+            signalc(Puste);
+    }
+
+	void usunZBufora() {
+        if (N == 0)
+            waitc(Puste);
+
+        Konsumuj();
+        N = N - 1;
+
+        if (N == rozmiar_buf - 1)
+            signalc(Pelne);
+	}
+}
+
+void Producent() {
+    while (1)
+        dodajDoBufora();
+}
+
+void Konsument() {
+    while (1)
+        usunZBufora();
+}
+
+main() {
+    cobegin {
+        Konsument();
+    	Konsument();
+        Producent();
+    }
+}
+
+Zadanie 22 -------------------------------------
+
+int Licznik=0;
+
+atomic void _Pokaz()
+{
+  string[80] str;
+
+  if( (0<=IloscCzytelnikow)
+   && (IloscCzytelnikow<=RozmiarCzytelni)
+   && (IloscPisarzy==0) ) return;
+
+  if( (IloscPisarzy==1) && (IloscCzytelnikow==0) ) return;
+
+  sprintf(str, "??? : IloscPisarzy=%d, IloscCzytelnikow=%d\n",
+    IloscPisarzy,IloscCzytelnikow);
+  cout<<str;
+
+  Licznik++;
+  if( Licznik==555 ) exit(0);
+}
+
+void _Kontrola()
+{
+  int atrapa;
+
+  while(1) {
+    _Pokaz();
+
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+  }
+}
+
+atomic void _Pokaz2()
+{
+  string[80] str;
+
+  sprintf(str, "[%3d] : IloscPisarzy=%d, IloscCzytelnikow=%d\n",
+    Licznik,IloscPisarzy,IloscCzytelnikow);
+  cout<<str;
+
+  if( (IloscCzytelnikow>0) && (IloscPisarzy>0) ) {
+    cout<<"error"<<endl;
+    exit(0);
+  }
+
+  Licznik++;
+  if( Licznik==1555 ) exit(0);
+}
+
+void _Kontrola2()
+{
+  int atrapa;
+
+  while(1) {
+    _Pokaz2();
+
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+  }
+}
+
+const int RozmiarCzytelni=5;
+
+int IloscCzytelnikow=0;
+int IloscPisarzy=0;
+
+binarysem I=1;
+
+semaphore R=RozmiarCzytelni;
+binarysem W=1;
+
+void Czytelnik(int nr)
+{
+  int atrapa;
+
+  while(1) {
+    wait(R);
+
+    wait(I);
+    IloscCzytelnikow++;
+    signal(I);
+
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+
+    wait(I);
+    IloscCzytelnikow--;
+    signal(I);
+
+    signal(R);
+
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+  }
+}
+
+void Pisarz(int nr)
+{
+  int i,j,atrapa;
+
+  while(1) {
+    wait(W);
+
+    for(i=1; i<=RozmiarCzytelni; i++) wait(R);
+
+    wait(I);
+    IloscPisarzy++;
+    signal(I);
+
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+
+    wait(I);
+    IloscPisarzy--;
+    signal(I);
+
+    for(i=1; i<=RozmiarCzytelni; i++) signal(R);
+
+    signal(W);
+
+    atrapa=123;
+    atrapa=123;
+    atrapa=123;
+  }
+}
+
+main()
+{
+  cobegin {
+    Czytelnik(1);
+    Czytelnik(2);
+    Czytelnik(3);
+    Czytelnik(4);
+    Czytelnik(5);
+    Czytelnik(6);
+    Czytelnik(7);
+
+    Pisarz(1);
+    Pisarz(2);
+
+    _Kontrola2();
+  }
+}

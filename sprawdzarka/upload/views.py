@@ -100,7 +100,8 @@ def plagiat(request):
                 if plagiarism_coefficient >= 30:
                     file_content += str(name_surname1)+ " " +str(nr_index1) + " całkowita ilość punktów "+ str(count_pkt1) +" "+str(xmlmetricf(Lista[i].task.name))+  " | "  +str(name_surname2) + " całkowita ilość punktów "+ str(count_pkt2) +" "+ str(nr_index2) + " "+str(xmlmetricf(Lista[j].task.name)) +" | " +"Procent podobieństwa " + str(plagiarism_coefficient)
                 else:
-                    file_content +="Oba teksty mają "+ str(plagiarism_coefficient) + " procent podobnych słów"
+                    file_content += str(name_surname1)+ " " +str(nr_index1) + " całkowita ilość punktów "+ str(count_pkt1) +" "+str(xmlmetricf(Lista[i].task.name))+  " | "  +str(name_surname2) + " całkowita ilość punktów "+ str(count_pkt2) +" "+ str(nr_index2) + " "+str(xmlmetricf(Lista[j].task.name)) +" | "
+                    file_content +="Oba teksty mają "+ str(plagiarism_coefficient) + " procent podobnych słów. "
                     file_content +="Prace są różne! Nie stwierdzam plagiatu!!"
             else:
                 file_content +="Nie można sprawdzić plagiatu dla pustych plików"
