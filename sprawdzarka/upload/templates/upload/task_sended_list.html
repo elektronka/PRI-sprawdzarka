@@ -16,9 +16,13 @@
 						<td>{{data.taskid}}</td>
 						<td>{{data.snumber}}</td>
 						<td>
-							<a href="/{{data.task.name}}" class="btn btn-primary btn-sm" target="_blank">
-								open file
-							</a>
+							<a href="/{{data.task.name}}" download="/{{data.task.name}}" class="btn btn-primary btn-sm"> 
+                                download file
+                            </a>
+							<a href="/{{data.task.name}}" class="btn btn-primary btn-sm"> 
+                                open file
+                            </a>
+
 						</td>
 					</tr>
 				{% endfor %}

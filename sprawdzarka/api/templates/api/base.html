@@ -29,7 +29,7 @@
           {% if user.is_staff %}
           <a class="nav-item nav-link" href="{% url 'api-home'%}">Home</a>
           <a class="nav-item nav-link" href="{% url 'about'%}">About</a>
-          <a class="nav-item nav-link" href="{% url 'plagiarism'%}">Plagiat</a>
+          <a class="nav-item nav-link" href="{% url 'plagiat'%}">Plagiat</a>
           <a class="nav-item nav-link" href="{% url 'task-list'%}">Lista zadań</a>
           <a class="nav-item nav-link" href="{% url 'task-list-upload'%}">Nowe zadanie</a>
           <a class="nav-item nav-link" href="{% url 'sended-list'%}">Oddane zadania studentów</a>
@@ -61,7 +61,7 @@
 
 <main role="main" class="container">
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-12">
       {% if messages %}
         {% for message in messages %}
           <div class="alert alert-{{ message.tags }}">
@@ -71,19 +71,6 @@
       {% endif %}
       {% block content %}{% endblock %}
       
-    </div>
-    <div class="col-md-4">
-      <div class="content-section">
-        <h3>Our Sidebar</h3>
-        <p class='text-muted'>You can put any information here you'd like.
-          <ul class="list-group">
-            <li class="list-group-item list-group-item-light">Latest Tasks</li>
-            <li class="list-group-item list-group-item-light">Announcements</li>
-            <li class="list-group-item list-group-item-light">Calendars</li>
-            <li class="list-group-item list-group-item-light">etc</li>
-          </ul>
-        </p>
-      </div>
     </div>
   </div>
 </main>

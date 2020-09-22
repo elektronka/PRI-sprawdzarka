@@ -43,9 +43,9 @@ class Report:
 
 class ProgramFile(Report):
 
-    def get_file(self):
-        file1 = open('solution.txt', 'r', encoding='utf8')
-        file2 = open('solution2.txt', 'r', encoding='utf8')
+    def get_file(self,plik1, plik2):
+        file1 = open(plik1, 'r', encoding='utf8')
+        file2 = open(plik2, 'r', encoding='utf8')
         return file1, file2
 
     def get_textlist(self, list_of_file1, list_of_file2):
