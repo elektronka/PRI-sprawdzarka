@@ -1,0 +1,641 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sprawozdanie PUBLIC "sprawozdanie" "http://mhanckow.vm.wmi.amu.edu.pl:20002/zajecia/file-storage/view/sprawozdanie.dtd">
+<sprawozdanie przedmiot="ALR" temat="A">
+<imie_nazwisko>Patryk Łukasiewicz</imie_nazwisko>
+<nr_indeksu>434743</nr_indeksu>
+<liczba_pkt>8</liczba_pkt>
+<zadanie nr="-1" pkt="1"></zadanie>
+<zadanie nr="0" pkt="1"></zadanie>
+<zadanie nr="1" pkt="1"></zadanie>
+<zadanie nr="1a" pkt="1"></zadanie>
+<zadanie nr="2" pkt="1"></zadanie>
+<zadanie nr="4" pkt="3"></zadanie>
+</sprawozdanie>
+
+Zadanie -1 -------------------------------------
+
+///wydruk
+
+plik events03.tcl:
+
+0: aaaaaaaaa
+1: aaaaaaaaa
+2: aaaaaaaaa
+0: bbbbbbbbb
+1: bbbbbbbbb
+2: bbbbbbbbb
+
+plik events03a.tcl:
+
+...
+
+fiber switchto 0; set zm
+  #% 2 1 0
+  #% 2 1 0
+  #% 1 2 0
+  #% 2 0 1
+  #% 1 0 2
+  #% 0 2 1
+  #% 0 1 2
+  
+Zadanie 0 ----------------------------
+
+/// wydruk
+
+0: , 
+1: 0, 
+2: , 
+3: , 
+4: , 
+0: , 
+1: , 
+2: 1, 
+3: , 
+4: , 
+0: , 
+1: , 
+2: , 
+3: 2, 
+4: , 
+0: , 
+1: , 
+2: , 
+3: , 
+4: 3, 
+0: 4, 
+1: , 
+2: , 
+3: , 
+4: , 
+0: , 
+1: 5, 
+2: , 
+3: , 
+4: , 
+...
+
+Zadanie 1 -------------------------------------
+
+# główny program na każdym wierzchołku/fiberze...
+fiber create $liczbaWierz 
+{
+
+  set leader ?
+
+  wyslij 0 $id_los
+  fiber yield;
+ 
+  while {$run} 
+  {
+    if {$kom(1)!=""} 
+    {
+      set x $kom(1)
+
+      if {$x > $id_los} 
+      {
+         wyslij 0 $x
+      }
+
+      if {$x == $id_los} 
+      {
+         set leader 1
+         wyslij 0 -1
+      }
+
+      if { $x < $id_los} 
+      {
+        if {$x == -1} 
+        {
+            if {$leader == "?"} 
+            {
+               set leader 0 
+               wyslij 0 -1
+            }
+         }
+      }
+    }
+    fiber yield;
+  }
+}
+  #% 
+ 
+Inicjalizacja; # trzeba koniecznie wywolac
+  #% 
+ 
+proc wizualizacja {} 
+{
+  fiber_iterate {_puts "$id: $id_los, $kom0, $kom1, $leader"}
+  # proc wizualizacja trzeba wywolac po kazdej rundzie
+}
+
+///wydruk
+
+0: 852, , 421, ?
+1: 421, , 516, ?
+2: 516, , 382, ?
+3: 382, , 793, ?
+4: 793, , 852, ?
+
+0: 852, , 516, ?
+1: 421, , , ?
+2: 516, , 793, ?
+3: 382, , 852, ?
+4: 793, , , ?
+
+0: 852, , , ?
+1: 421, , 793, ?
+2: 516, , 852, ?
+3: 382, , , ?
+4: 793, , , ?
+
+0: 852, , 793, ?
+1: 421, , 852, ?
+2: 516, , , ?
+3: 382, , , ?
+4: 793, , , ?
+
+0: 852, , 852, ?
+1: 421, , , ?
+2: 516, , , ?
+3: 382, , , ?
+4: 793, , , ?
+
+0: 852, , , 1
+1: 421, , , ?
+2: 516, , , ?
+3: 382, , , ?
+4: 793, , -1, ?
+
+0: 852, , , 1
+1: 421, , , ?
+2: 516, , , ?
+3: 382, , -1, ?
+4: 793, , , 0
+
+0: 852, , , 1
+1: 421, , , ?
+2: 516, , -1, ?
+3: 382, , , 0
+4: 793, , , 0
+
+0: 852, , , 1
+1: 421, , -1, ?
+2: 516, , , 0
+3: 382, , , 0
+4: 793, , , 0
+
+0: 852, , -1, 1
+1: 421, , , 0
+2: 516, , , 0
+3: 382, , , 0
+4: 793, , , 0
+
+0: 852, , , 1
+1: 421, , , 0
+2: 516, , , 0
+3: 382, , , 0
+4: 793, , , 0
+
+Zadanie 1a -------------------------------------
+
+fiber create $liczbaWierz 
+{
+  set leader ?
+
+  wyslij 0 $id_los
+  fiber yield;
+ 
+  while {$run} 
+  {
+    if {$kom(1)!=""} 
+    {
+      set x $kom(1)
+
+      if {$x > $id_los} 
+      {
+         wyslij 0 $x
+      }
+
+      if {$x == $id_los} 
+      {
+         set leader 1
+         wyslij 0 -1
+      }
+
+      if { $x < $id_los} 
+      {
+        if {$x == -1} 
+        {
+          if {$leader == "?"} 
+          {
+            set leader 0 
+            wyslij 0 -1
+          }
+        }
+      }
+    }
+    if {$kom(0)!=""} 
+    {
+      set x $kom(0)
+
+      if {$x > $id_los} 
+      {
+         wyslij 1 $x
+      }
+
+      if {$x == $id_los} 
+      {
+         set leader 1
+         wyslij 1 -1
+      }
+
+      if { $x < $id_los} 
+      {
+        if {$x == -1} 
+        {
+          if {$leader == "?"} 
+          {
+            set leader 0 
+            wyslij 1 -1
+          }
+        }
+      }
+    }
+    fiber yield;
+  }
+}
+
+///wydruk
+
+0: 320, , 36, ?
+1: 36, , 402, ?
+2: 402, , 651, ?
+3: 651, , 91, ?
+4: 91, , 320, ?
+0: 320, , 402, ?
+1: 36, , 651, ?
+2: 402, , , ?
+3: 651, , 320, ?
+4: 91, , , ?
+0: 320, , 651, ?
+1: 36, , , ?
+2: 402, , , ?
+3: 651, , , ?
+4: 91, , 402, ?
+0: 320, , , ?
+1: 36, , , ?
+2: 402, , , ?
+3: 651, , 402, ?
+4: 91, , 651, ?
+0: 320, , , ?
+1: 36, , , ?
+2: 402, , , ?
+3: 651, , 651, ?
+4: 91, , , ?
+0: 320, , , ?
+1: 36, , , ?
+2: 402, , -1, ?
+3: 651, , , 1
+4: 91, , , ?
+0: 320, , , ?
+1: 36, , -1, ?
+2: 402, , , 0
+3: 651, , , 1
+4: 91, , , ?
+0: 320, , -1, ?
+1: 36, , , 0
+2: 402, , , 0
+3: 651, , , 1
+4: 91, , , ?
+0: 320, , , 0
+1: 36, , , 0
+2: 402, , , 0
+3: 651, , , 1
+4: 91, , -1, ?
+0: 320, , , 0
+1: 36, , , 0
+2: 402, , , 0
+3: 651, , -1, 1
+4: 91, , , 0
+0: 320, , , 0
+1: 36, , , 0
+2: 402, , , 0
+3: 651, , , 1
+4: 91, , , 0
+
+Zadanie 2 -----------------------------
+
+source symul_lib.tcl;
+
+set liczbaWierz 7
+set sasiedzi(0) {0 1}
+set sasiedzi(1) {0 2}
+set sasiedzi(2) {1 3 5 6}
+set sasiedzi(3) {2 4}
+set sasiedzi(4) {3 }
+set sasiedzi(5) {2 }
+set sasiedzi(6) {2 }
+ 
+# glowny program na kazdym fiberze
+fiber create $liczbaWierz 
+{
+
+set L 40
+set Cv [wyrownaj $L [bity $id_los]]
+set Cpv 0
+set porownanie 0
+set b 0
+set c 0
+set nCv 0
+set wiad 0
+
+for {set i 1} {$i < $stopien} {incr i} {wyslij $i $Cv}
+
+fiber yield;
+
+      while {$run} 
+        {
+	if {$kom(0)!=""} 
+        {
+	  set Cpv $kom(0)
+	} 
+        else 
+        {
+	  set Cpv [wyrownaj $L [bity 0]]
+	}
+	set porownanie [porownanieC $Cv $Cpv]
+	#numer
+	set b [lindex $porownanie 0]
+	#wartosc
+	set c [lindex $porownanie 1]	
+	
+	set L [expr {int(ceil(log($L)/log(2)) + 1)}]
+
+	set nCv [wyrownaj $L "[bity $b]$c"]
+	
+	set Cv $nCv
+
+	for {set i 1} {$i < $stopien} {incr i} {wyslij $i $Cv}
+
+    fiber yield; # oznacza koniec rundy
+  }
+}
+
+set obslugaBitow 
+{
+
+...
+
+}
+
+fiber_iterate $obslugaBitow
+ 
+Inicjalizacja;
+ 
+proc wizualizacja {} 
+{
+  _puts "-------------------------------------"
+  fiber_iterate {_puts "$id, $Cv ,wiad $b, $c"}   
+}
+ 
+
+fiber yield; runda; wizualizacja
+
+fiber error
+
+///wydruk
+
+0, 0000000000000000000000000000001110110100 ,wiad 0, 0
+1, 0000000000000000000000000000000010101010 ,wiad 0, 0
+2, 0000000000000000000000000000000001000011 ,wiad 0, 0
+3, 0000000000000000000000000000000011000100 ,wiad 0, 0
+4, 0000000000000000000000000000000010101100 ,wiad 0, 0
+5, 0000000000000000000000000000001001000111 ,wiad 0, 0
+6, 0000000000000000000000000000000101100011 ,wiad 0, 0
+-------------------------------------
+0, 0000101 ,wiad 2, 1
+1, 0000011 ,wiad 1, 1
+2, 0000001 ,wiad 0, 1
+3, 0000000 ,wiad 0, 0
+4, 0000111 ,wiad 3, 1
+5, 0000101 ,wiad 2, 1
+6, 0001011 ,wiad 5, 1
+-------------------------------------
+0, 0001 ,wiad 0, 1
+1, 0011 ,wiad 1, 1
+2, 0010 ,wiad 1, 0
+3, 0000 ,wiad 0, 0
+4, 0001 ,wiad 0, 1
+5, 0101 ,wiad 2, 1
+6, 0011 ,wiad 1, 1
+-------------------------------------
+0, 001 ,wiad 0, 1
+1, 011 ,wiad 1, 1
+2, 000 ,wiad 0, 0
+3, 010 ,wiad 1, 0
+4, 001 ,wiad 0, 1
+5, 001 ,wiad 0, 1
+6, 001 ,wiad 0, 1
+
+Zadanie 4 -------------------------------------
+
+source symul_lib.tcl;
+
+set liczbaWierz 12
+set sasiedzi(0) {0 1}
+set sasiedzi(1) {0 2 3}
+set sasiedzi(2) {1 4 5}
+set sasiedzi(3) {1 6 7 8}
+set sasiedzi(4) {2 }
+set sasiedzi(5) {2 }
+set sasiedzi(6) {3 9}
+set sasiedzi(7) {3 }
+set sasiedzi(8) {3 10 11}
+set sasiedzi(9) {6 }
+set sasiedzi(10) {8 }
+set sasiedzi(11) {8 }
+
+
+ 
+# glowny program na kazdym fiberze
+fiber create $liczbaWierz 
+{
+
+set L 40
+set Cv [wyrownaj $L [bity $id_los]]
+set Cpv 0
+set porownanie 0
+set b 0
+set c 0
+set nCv 0
+set wiad 0
+
+for {set i 1} {$i < $stopien} {incr i} {wyslij $i $Cv}
+
+fiber yield;
+ 
+	while {$run} 
+        {
+	
+		if {$L != 3} 
+                {
+			if {$kom(0)!=""} 
+                	{
+				set Cpv $kom(0)
+			} 
+                	else 
+                	{
+				set Cpv [wyrownaj $L [bity 0]]
+			}
+		
+		set porownanie [porownanieC $Cv $Cpv]
+		#numer bitu
+
+		set b [lindex $porownanie 0]
+		#wartosc bitu
+
+		set c [lindex $porownanie 1]	
+		
+		set L [expr {int(ceil(log($L)/log(2)) + 1)}]
+		set nCv [wyrownaj $L "[bity $b]$c"]
+		
+		set Cv $nCv
+		
+		for {set i 1} {$i < $stopien} {incr i} {wyslij $i $Cv}
+			fiber yield; 
+		} 
+                else 
+                {
+			for {set w 3} {$w < 8} {incr w} 
+                        {	
+				for {set i 1} {$i < $stopien} {incr i} {wyslij $i $Cv}
+				set SCv [bin2dec $Cv]
+				set Cv [bin2dec $kom0]
+				
+				fiber yield;
+				for {set i 1} {$i < $stopien} {incr i} {wyslij $i $Cv}
+				set PCv	[bin2dec $kom0]
+				
+				if {$Cv == $w} {
+					if {[lsearch "$PCv $SCv" 0] == -1} 
+                                        {
+						set Cv 0
+					}
+
+					if {[lsearch "$PCv $SCv" 1] == -1} 
+                                        {
+						set Cv 1
+					}
+
+					if {[lsearch "$PCv $SCv" 2] == -1} 
+                                        {
+						set Cv 2
+					}
+				}
+			}
+		}
+	}
+}
+
+set obslugaBitow 
+{
+
+...
+
+}
+
+fiber_iterate $obslugaBitow
+ 
+Inicjalizacja;
+
+proc wizualizacja {} 
+{
+	_puts "-------------------------------------"
+	fiber_iterate {_puts "id: $id\t kolor: $Cv"}  
+}
+ 
+
+fiber yield; runda; wizualizacja
+
+fiber error
+
+///wydruk
+
+-------------------------------------
+id: 0	 kolor: 0000000000000000000000000000001001101100
+id: 1	 kolor: 0000000000000000000000000000000100100010
+id: 2	 kolor: 0000000000000000000000000000001000001100
+id: 3	 kolor: 0000000000000000000000000000001110001001
+id: 4	 kolor: 0000000000000000000000000000001011110110
+id: 5	 kolor: 0000000000000000000000000000000001011100
+id: 6	 kolor: 0000000000000000000000000000000000111010
+id: 7	 kolor: 0000000000000000000000000000001000000010
+id: 8	 kolor: 0000000000000000000000000000001110100001
+id: 9	 kolor: 0000000000000000000000000000000011011010
+id: 10	 kolor: 0000000000000000000000000000001110001110
+id: 11	 kolor: 0000000000000000000000000000001100010111
+-------------------------------------
+id: 0	 kolor: 0000101
+id: 1	 kolor: 0000011
+id: 2	 kolor: 0000010
+id: 3	 kolor: 0000001
+id: 4	 kolor: 0000011
+id: 5	 kolor: 0001001
+id: 6	 kolor: 0000000
+id: 7	 kolor: 0000000
+id: 8	 kolor: 0000110
+id: 9	 kolor: 0001010
+id: 10	 kolor: 0000000
+id: 11	 kolor: 0000011
+-------------------------------------
+id: 0	 kolor: 0001
+id: 1	 kolor: 0011
+id: 2	 kolor: 0000
+id: 3	 kolor: 0010
+id: 4	 kolor: 0001
+id: 5	 kolor: 0001
+id: 6	 kolor: 0000
+id: 7	 kolor: 0000
+id: 8	 kolor: 0000
+id: 9	 kolor: 0011
+id: 10	 kolor: 0010
+id: 11	 kolor: 0001
+-------------------------------------
+id: 0	 kolor: 001
+id: 1	 kolor: 011
+id: 2	 kolor: 000
+id: 3	 kolor: 000
+id: 4	 kolor: 001
+id: 5	 kolor: 001
+id: 6	 kolor: 010
+id: 7	 kolor: 010
+id: 8	 kolor: 010
+id: 9	 kolor: 001
+id: 10	 kolor: 011
+id: 11	 kolor: 001
+-------------------------------------
+id: 0	 kolor: 0
+id: 1	 kolor: 1
+id: 2	 kolor: 3
+id: 3	 kolor: 3
+id: 4	 kolor: 0
+id: 5	 kolor: 0
+id: 6	 kolor: 0
+id: 7	 kolor: 0
+id: 8	 kolor: 0
+id: 9	 kolor: 2
+id: 10	 kolor: 2
+id: 11	 kolor: 2
+-------------------------------------
+id: 0	 kolor: 0
+id: 1	 kolor: 1
+id: 2	 kolor: 2
+id: 3	 kolor: 2
+id: 4	 kolor: 0
+id: 5	 kolor: 0
+id: 6	 kolor: 0
+id: 7	 kolor: 0
+id: 8	 kolor: 0
+id: 9	 kolor: 2
+id: 10	 kolor: 2
+id: 11	 kolor: 2

@@ -59,10 +59,12 @@ def task_List_upload(request):
 
 @login_required
 def read_file2(request, file_to_open):
-    f = open(r'task/tasklist/'+file_to_open, 'r')
-    file_content = f.read()
+    f = open(r'task/tasklist/'+file_to_open, encoding="utf-8")
+    result = []
+    for line in f:
+        result.append(line)
     f.close()
-    return HttpResponse(file_content, content_type="text/plain")
+    return render(request,'upload/wyswietlanie.html',{'result': result},)
 
 @staff_member_required(login_url='login')
 def plagiat(request):
