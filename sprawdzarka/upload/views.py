@@ -12,7 +12,7 @@ from django.http import HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from .antyplagiat import *
-
+from .xml_metric import xmlmetricf
 
 class StudentViewSet(viewsets.ModelViewSet):
 
@@ -21,7 +21,7 @@ class StudentViewSet(viewsets.ModelViewSet):
 
 @staff_member_required(login_url='login')
 def task_sended_list(request):
-    sended=SendedTasks.objects.all
+    sended=SendedTasks.objects.all()
     return render(request,'upload/task_sended_list.html',{'sended': sended})
 
 @login_required
@@ -36,10 +36,12 @@ def task_sended_upload(request):
 
 @login_required
 def read_file1(request, file_to_open):
-    f = open(r'task/sendedtasks/'+file_to_open, 'r')
-    file_content = f.read()
+    f = open(r'task/sendedtasks/'+file_to_open, encoding="utf-8")
+    result = []
+    for line in f:
+        result.append(line)
     f.close()
-    return render(request,'upload/wyswietlanie.html',{'file_content': file_content})
+    return render(request,'upload/wyswietlanie.html',{'result': result},)
 
 def task_list(request):
     sended=TaskList.objects.all
@@ -64,7 +66,7 @@ def read_file2(request, file_to_open):
 
 @staff_member_required(login_url='login')
 def plagiat(request):
-
+    result_list = []
     file_content=""
     Lista=[]
     for file in SendedTasks.objects.all():
@@ -72,6 +74,7 @@ def plagiat(request):
     dlug=len(Lista)
     for i in range(dlug):
         for j in range (i+1,dlug,1):
+            file_content = ""
             plagiarism = ProgramFile("Bartłomiej Nowak", "434162", "15")
             file1, file2 = plagiarism.get_file(Lista[i].task.name, Lista[j].task.name)
             name_surname1, nr_index1, count_pkt1 = plagiarism.ReadReport(file1)
@@ -86,7 +89,6 @@ def plagiat(request):
                         count_of_the_same_or_similar += result
                     total = len(text_list1)
                     plagiarism_coefficient = round(count_of_the_same_or_similar * 100 / total, 2)
-
                 else:
                     for checked in to_check:
                         result = plagiarism.check_the_similar_words(checked, text_list2)
@@ -94,11 +96,14 @@ def plagiat(request):
                     total = len(text_list2)
                     plagiarism_coefficient = round(count_of_the_same_or_similar * 100 / total, 2)
                 if plagiarism_coefficient >= 30:
-                    file_content += str(name_surname1)+ " " +str(nr_index1) + " " + str(name_surname2) +" "+ str(nr_index2) + " " + "Procent podobieństwa " + str(plagiarism_coefficient)
+                    file_content += str(name_surname1)+ " " +str(nr_index1) + " całkowita ilość punktów "+ str(count_pkt1) +" "+str(xmlmetricf(Lista[i].task.name))+  " | "  +str(name_surname2) + " całkowita ilość punktów "+ str(count_pkt2) +" "+ str(nr_index2) + " "+str(xmlmetricf(Lista[j].task.name)) +" | " +"Procent podobieństwa " + str(plagiarism_coefficient)
                 else:
                     file_content +="Oba teksty mają "+ str(plagiarism_coefficient) + " procent podobnych słów"
                     file_content +="Prace są różne! Nie stwierdzam plagiatu!!"
             else:
                 file_content +="Nie można sprawdzić plagiatu dla pustych plików"
-            file_content+="\n"
-    return render(request,'upload/plagiat.html', {'file_content': file_content})
+            result_list.append(file_content)
+    return render(request,'upload/plagiat.html', {'result_list': result_list})
+
+
+

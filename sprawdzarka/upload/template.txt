@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sprawozdanie PUBLIC "sprawozdanie" "http://mhanckow.vm.wmi.amu.edu.pl:20002/zajecia/file-storage/view/sprawozdanie.dtd">
+<sprawozdanie przedmiot="" temat="">
+<imie_nazwisko></imie_nazwisko>
+<nr_indeksu></nr_indeksu>
+<liczba_pkt></liczba_pkt>
+</sprawozdanie>

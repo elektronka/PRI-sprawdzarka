@@ -1,4 +1,3 @@
-
 {% extends "api/base.html" %}
 {% block content %}
 	<table class="table">
@@ -11,10 +10,12 @@
 			</tr>
 			<tbody>
 				{% for data in sended %}
+				{if }
 					<tr>
 						<td>{{data.id}}</td>
 						<td>{{data.taskid}}</td>
 						<td>{{data.snumber}}</td>
+
 						<td>
 							<a href="/{{data.task.name}}" download="/{{data.task.name}}" class="btn btn-primary btn-sm"> 
                                 download file

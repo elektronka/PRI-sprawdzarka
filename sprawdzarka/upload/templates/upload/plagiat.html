@@ -1,8 +1,10 @@
 {% extends "api/base.html" %}
 {% block content %}
 
-	<h1>Osoby podejrzane o plagiat: </h1>
-	<div class="plagiat">
-	{{ file_content }}
-	</div>
+    <h1>Osoby podejrzane o plagiat: </h1>
+    <div class="plagiat">
+    {% for line in result_list%}
+    <p>{{ line }}</p>
+    {% endfor %}
+    </div>
 {% endblock %}
