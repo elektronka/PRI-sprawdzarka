@@ -22,6 +22,14 @@ class Report:
                         break
                     if line[j] == '>':
                         j = j + 1
+                        if line[j] == '<':
+                            if i == 3:
+                                name_surname += '-'
+                            elif i == 4:
+                                nr_index += '-'
+                            elif i == 5:
+                                count_pkt += '-'
+                            break
                         was = True
                         while True:
                             if i == 3:
