@@ -125,8 +125,23 @@ def plagiat(request):
     for first_file in files_and_enlargement:
         for second_file in files_and_enlargement:
             if first_file != second_file:
+                name_of_first_file = []
+                name_of_second_file = []
+                i = len(first_file)
+                while first_file[i - 1] == '/':
+                    name_of_first_file.append(first_file[i])
+                    i = i - 1
+                name_of_first_file.reverse()
+                name_of_first_file = ''.join(str(i) for i in name_of_first_file)
+                print(name_of_first_file)
+                j = len(second_file)
+                while second_file[j - 1] == '/':
+                    name_of_second_file.append(second_file[j])
+                    j = j - 1
+                name_of_second_file.reverse()
+                name_of_second_file = ''.join(str(j) for j in name_of_second_file)
                 file_content += '\n'
-                file_content += "Sprawdzam " + str(first_file) + " i " + str(second_file)
+                file_content += "Sprawdzam " + str(name_of_first_file) + " i " + str(name_of_second_file)
                 file_content += '\n'
                 if files_and_enlargement[first_file] == '.txt' and files_and_enlargement[second_file] == '.txt':
                     file1 = open(first_file, 'r', encoding="utf-8")
@@ -248,5 +263,6 @@ def plagiat(request):
             else:
                 continue
             result_list.append(file_content)
+    del(file_content)
     return render(request, 'upload/plagiat.html', {'result_list': result_list})
 
