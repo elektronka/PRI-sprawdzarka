@@ -1,0 +1,30 @@
+{% extends "api/base.html" %}
+{% block content %}
+<a class="btn btn-outline-info" href="{% url 'tests_home' %}">Wróć</a></td>
+<table class="table">
+    <tr>
+        <th>Nazwa testu</th>
+        <th>  Data rozpoczęcia</th>
+        <th>  Data zakończenia</th>
+        {% if user.is_staff %}
+            <th>Grupa</th>
+        {% else %}
+        <th>  Rozwiąż test</th>
+        {% endif %}
+    </tr>
+    {% for test in all %}
+    <tr>
+        <td>{{test.name}}</td>
+        <td>{{test.date_start}}</td>
+        <td>{{test.date_end}}</td>
+        {% if user.is_staff %}
+        <td>{{test.group_id}}</td>
+        {% else %}
+        <td><a class="btn btn-outline-info" href="{% url 'test' test_id=test.id question_id=1%}">Rozwiąż test</a></td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+    
+
+{% endblock %}

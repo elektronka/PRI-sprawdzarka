@@ -1,0 +1,12 @@
+{% extends "api/base.html" %}
+{% load crispy_forms_tags  %} 
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+			<h2>Zmień punktację zadania: {{zadanie}} </h2>
+            <h2>Studenta:  {{snumber}}</h2>
+			<h2>Stare punkty: {{old_points}} </h2>
+			{% csrf_token %}
+			{{form|crispy}}
+			<button type="submit" class="btn btn-primary">Zmień punktację</button>
+		</form>
+{% endblock %}

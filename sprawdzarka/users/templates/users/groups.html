@@ -1,0 +1,31 @@
+{% extends "api/base.html" %}
+{% load crispy_forms_tags  %}
+{% block content %}
+    {% if user.is_staff %}
+        <a class="nav-item nav-link" href="{% url 'new_group'%}">Dodaj nową grupę</a>
+    {% endif %}
+<table class="table">
+    <tr>
+        <th>Nazwa grupy  </th>
+        <th>Podgląd</th>
+        <th>Zamknij grupę</th>
+
+    </tr>
+    {% for group in all %}
+        {% if group.is_active == True %}
+        <tr>
+            <td>{{ group.group }}</td>
+            <td><a class="btn btn-primary btn-sm" href="{% url 'group' group_id=group.id %}">Pokaż grupę</a></td>
+            <td><a class="btn btn-primary btn-sm" href="{% url 'delete' group_id=group.id %}">Zamknij grupę</a></td>
+        </tr>
+        {% else %}
+        <tr>
+            <td>{{ group.group }}</td>
+            <td><a class="btn btn-primary btn-sm" href="{% url 'group' group_id=group.id %}">Pokaż grupę</a></td>
+        </tr>
+            
+        {% endif %}
+    {% endfor %}
+</table>
+    
+{% endblock content %}

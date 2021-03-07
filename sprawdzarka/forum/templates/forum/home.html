@@ -1,0 +1,8 @@
+{% extends "api/base.html" %}
+{% block content %}
+    <a class="btn btn-outline-info" href="{% url 'all' choose=choose%}">Zobacz wszystkie pytania</a><br><br>
+    {% if user.is_staff %}
+        <a class="btn btn-outline-info" href="{% url 'new' choose=choose%}">Zobacz nowe pytania</a><br><br>
+    {% endif %}
+    <a class="btn btn-outline-info" href="{% url 'add_question_choose' choose=choose%}">Dodaj pytanie</a><br><br>
+{% endblock %}

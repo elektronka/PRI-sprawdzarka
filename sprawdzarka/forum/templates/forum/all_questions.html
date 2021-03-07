@@ -1,0 +1,26 @@
+{% extends "api/base.html" %}
+{% load static %}
+{% block content %}
+    <table class="table">
+        <tr>
+            <th class="table_cell">taskid  </th>
+            <th class="table_cell">snumber  </th>
+            <th class="table_cell">Data zadania pytania  </th>
+            <th class="table_cell">Czy jest odpowiedź prowadzącego  </th>
+            <th class="table_cell">Wyświetl  </th>
+        </tr>
+        {% for data in all %}
+       <tr>
+            <td class="table_cell">{{data.task_id }}</td>
+            <td class="table_cell">{{data.asking_student}}</td>
+        <td>{{data.date}}</td>
+            {% if data.has_teacher_answer == True %}
+            <td class="table_cell">Tak</td>
+            {% else %}
+            <td class="table_cell">Nie</td>
+            {% endif %}
+            <td class="table_cell"><a class="btn btn-outline-info" href="{% url 'question' choose=choose id=data.id %}">Zobacz pytanie</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

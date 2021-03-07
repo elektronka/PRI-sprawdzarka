@@ -1,0 +1,24 @@
+{% extends "api/base.html" %}
+{% block content %}
+<h2>Punktacja studenta: {{snumber}}</h2>
+<h2>Za temat: {{task_to_html.taskid}}</h2>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Numer zadania </th>
+				<th>Pkt za zadanie </th>
+				<th>Edycja zadania</th>
+			</tr>
+		<tbody>
+			{% for data in PointsToShow %}
+				<tr>
+					<td>{{data.number_task}}</td>
+					<td>{{data.points}}</td>
+					<td><a href="{% url 'change-points-xml-direct' snumber_in_url=data.snumber task_id_in_url=data.taskid.id number_task_in_url=data.number_task%}" class="btn btn-primary btn-sm">Edytuj punktacje zadania</a></td>
+				</tr>
+			{% endfor %}
+    	</tbody>
+		</thead>
+	</table>
+    <p>Suma pkt: {{suma}}</p>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "api/base.html" %}
+{% load crispy_forms_tags  %}
+{% block content %}
+<table>
+	<tr>
+		{% for id in all_ids %}
+			{% if color == 'LimeGreen' %}
+				<td style="padding: 3px;"><a style="background-color:LimeGreen" class="btn btn-outline-info" href="{% url 'test' test_id=test_id question_id=id.question_id %}">{{ id.question_id }}</a></td>
+			{% else %}
+				<td style="padding: 3px;"><a style="background-color:LightSteelBlue" class="btn btn-outline-info" href="{% url 'test' test_id=test_id question_id=id.question_id %}">{{ id.question_id }}</a></td>
+			{% endif %}
+		{% endfor %}
+	</tr>
+</table>
+		<form method="post">
+			<h3>{{ question.content }}</h3>
+			{% csrf_token %}
+			{{form|crispy}}
+			<button type="submit" class="btn btn-primary">Zatwierdź</button>
+		</form>
+		<br>
+		<br>
+	<a class="btn btn-outline-info" href="{% url 'confirm_test' test_id=test_id %}">Zatwierdź Test</a><br><br>
+{% endblock %}
+        

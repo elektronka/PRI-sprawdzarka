@@ -25,23 +25,21 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarToggle">
         <div class="navbar-nav mr-auto">
-          
+          <a class="nav-item nav-link" href="{% url 'api-home'%}">Home</a>        
           {% if user.is_staff %}
-          <a class="nav-item nav-link" href="{% url 'api-home'%}">Home</a>
-          <a class="nav-item nav-link" href="{% url 'about'%}">About</a>
-          <a class="nav-item nav-link" href="{% url 'plagiat'%}">Plagiat</a>
-          <a class="nav-item nav-link" href="{% url 'task-list'%}">Lista zadań</a>
-          <a class="nav-item nav-link" href="{% url 'task-list-upload'%}">Nowe zadanie</a>
-          <a class="nav-item nav-link" href="{% url 'sended-list'%}">Oddane zadania studentów</a>
+          <a class="nav-item nav-link" href="{% url 'plagiat' %}">Plagiat</a>
+          <a class="nav-item nav-link" href="{% url 'task-list-choose' %}">Lista zadań</a>
+          <a class="nav-item nav-link" href="{% url 'groups_choose' %}">Grupy zajęciowe</a>
+          <a class="nav-item nav-link" href="{% url 'task-upload-choose' %}">Nowe zadanie otwarte</a>
+          <a class="nav-item nav-link" href="{% url 'task-sended-choose' %}">Oddane zadania studentów</a>
+          <a class="nav-item nav-link" href="{% url 'forum' %}">Forum</a>
+          <a class="nav-item nav-link" href="{% url 'tests_home' %}">Testy</a>
           {% elif user.is_authenticated  %}
-          <a class="nav-item nav-link" href="{% url 'api-home'%}">Home</a>
-          <a class="nav-item nav-link" href="{% url 'about'%}">About</a>
-          <a class="nav-item nav-link" href="{% url 'task-list'%}">Lista zadań</a>
-          <a class="nav-item nav-link" href="{% url 'upload'%}">Oddaj zadanie</a>
+          <a class="nav-item nav-link" href="{% url 'task-list-choose' %}">Lista zadań</a>
+          <a class="nav-item nav-link" href="{% url 'upload' %}">Oddaj zadanie otwarte</a>
+          <a class="nav-item nav-link" href="{% url 'forum' %}">Forum</a>
+          <a class="nav-item nav-link" href="{% url 'tests_home' %}">Testy</a>
           {% else %}
-          <a class="nav-item nav-link" href="{% url 'api-home'%}">Home</a>
-          <a class="nav-item nav-link" href="{% url 'about'%}">About</a>
-          <a class="nav-item nav-link" href="{% url 'task-list'%}">Lista zadań</a>
           {% endif %}
         </div>
         <!-- Navbar Right Side -->

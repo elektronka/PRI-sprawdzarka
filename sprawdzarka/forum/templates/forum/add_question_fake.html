@@ -1,0 +1,9 @@
+{% extends "api/base.html" %}
+{% load crispy_forms_tags  %}
+{% block content %}
+    <form method="POST" >
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" class="btn btn-outline-info" value="Zadaj pytanie">
+    </form>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "api/base.html" %}
+{% block content %}
+<table>
+	<tr>
+		{% for id in all_ids %}
+			<td style="padding: 3px;"><a class="btn btn-outline-info" href="{% url 'test' test_id=test_id question_id=id.question_id %}">{{ id.question_id }}</a></td>
+		{% endfor %}
+	</tr>
+</table>
+		{% for answer in answers %}
+            {{ answer.question_id }} {{ answer.answer }} <br>
+        {% endfor %} 
+        <br>
+        <a class="btn btn-outline-info" href="{% url 'end_test' test_id=test_id %}">Zatwierdź</a><br><br>
+{% endblock %}
+        

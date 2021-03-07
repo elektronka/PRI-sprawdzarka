@@ -3,24 +3,18 @@
 	<table class="table">
 			<thead>
 			<tr>
-				<th>id </th>
-				<th>task id </th>
-				<th>snumber </th>
-				<th>task</th>
+				<th>Numer zadania </th>
+				<th>Numer studenta </th>
+				<th>Zadanie</th>
+				<th>Zobacz punktację</th>
 			</tr>
 			<tbody>
 				{% for data in sended %}
 					<tr>
-						<td>{{data.id}}</td>
 						<td>{{data.taskid}}</td>
 						<td>{{data.snumber}}</td>
-
-						<td>
-							<a href="/{{data.task.name}}" class="btn btn-primary btn-sm"> 
-                                open file
-                            </a>
-
-						</td>
+						<td><a href="/{{data.task}}" class="btn btn-primary btn-sm">Otwórz plik</a></td>
+						<td><a class="btn btn-outline-info" href="{% url 'change-points-xml' snumber_in_url=data.snumber task_id_in_url=data.taskid.id %}">Zobacz punktację</a></td>
 					</tr>
 				{% endfor %}
 			</tbody>

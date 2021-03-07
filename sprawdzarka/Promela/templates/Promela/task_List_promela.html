@@ -1,0 +1,55 @@
+
+
+{% extends "api/base.html" %}
+{% block content %}
+{% if user.is_staff %}
+<table class="table">
+	<thead>
+	<tr>
+		<th>Nazwa zadania  </th>
+		<th>Treść  </th>
+		<th>Grupa  </th>
+		<th>Deadline </th>
+		<th>Zadanie  </th>		
+	</tr>
+	<tbody>
+		{% for data in sended %}
+			<tr>
+					<td>{{data.task_name}}</td>
+					<td>{{data.task_content}}</td>
+					<td>{{data.group_id}}</td>
+					<td>{{data.date_end}}</td>
+					<td><a href="{{data.file.name}}" class="btn btn-primary btn-sm">Otwórz plik</a></td>
+			</tr>
+		{% endfor %}
+	</tbody>
+	</thead>
+</table>
+
+{% else %}
+
+	<table class="table">
+			<thead>
+			<tr>
+				<th>Nazwa zadania  </th>
+				<th>Treść </th>
+				<th>Deadline </th>
+				<th>Zadaj pytanie</th>
+
+			</tr>
+			<tbody>
+				{% for data in sended %}
+					<tr>
+						{% if data.group_id.str_id == user.group_id %}
+							<td>{{data.task_name}}</td>
+							<td>{{data.task_content}}</td>
+							<td>{{data.date_end}}</td>
+							<td><a class="btn btn-outline-info" href="{% url 'ask_question' choose='promela' id=data.id %}">Zadaj pytanie prowadzącemu</a></td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+			</tbody>
+			</thead>
+		</table>
+{% endif %}
+{% endblock %}

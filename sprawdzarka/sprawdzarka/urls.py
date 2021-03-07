@@ -1,31 +1,27 @@
-"""sprawdzarka URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
 from users import views as user_views
 from django.contrib.auth import views as auth_views
-from api import views as api_views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', user_views.register, name='register'),
     path('profile/', user_views.profile, name='profile'),
+    path('profile/changepassword', user_views.change_password, name='change-password'),
+    path('choose/',user_views.groups_choose, name = 'groups_choose'),
+    path('delete/<str:group_id>',user_views.delete_group, name = 'delete'),
+    path('grupy/',user_views.all_groups, name = 'all_groups'),
+    path('aktywne/',user_views.active_groups, name = 'active_groups'),
+    path('change/<str:snumber>',user_views.change_group, name = 'change_group'),
+    path('grupy/<str:group_id>',user_views.all_students, name = 'group'),
+    path('nowa_grupa',user_views.new_group, name = 'new_group'),
     path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
+    path('tests/', include('tests.urls')),
     path('', include('api.urls')),
-    path('task/', include('upload.urls'))
-
+    path('task/', include('upload.urls')),
+    path('promela/', include('Promela.urls')),
+    path('forum/', include('forum.urls')),
+    path('captcha/', include('captcha.urls')),
 ]

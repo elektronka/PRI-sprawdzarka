@@ -1,0 +1,10 @@
+{% extends "api/base.html" %}
+{% load crispy_forms_tags  %}
+{% block content %}
+		<form method="post" enctype="multipart/form-data">
+			<h2>Dodaj nowy test</h2>
+			{% csrf_token %}
+			{{ form|crispy }}
+			<button type="submit" class="btn btn-primary">Prześlij plik</button>
+		</form>
+{% endblock %}

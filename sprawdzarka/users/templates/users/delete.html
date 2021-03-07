@@ -1,0 +1,12 @@
+{% extends "api/base.html" %}
+{% load crispy_forms_tags  %}
+{% block content %}
+<form method = 'POST'>
+    {% csrf_token %}
+    {{ form|crispy }} 
+    <p>Czy na pewno chcesz usunąć grupę?</p>
+    <button class="btn btn-outline-info" type="submit">Usuń</button>
+    <a class="btn btn-outline-info" href="{% url 'active_groups' %}">Nie</a>
+</form>
+        
+{% endblock content %}

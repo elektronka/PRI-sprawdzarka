@@ -1,0 +1,18 @@
+{% extends "api/base.html" %}
+{% load crispy_forms_tags  %}
+{% block content %}
+<table class = 'table'>
+    <tr>
+        <th>Student  </th>
+        <th>Liczba punktów </th>
+        <th>Zmień grupę</th>
+    </tr>
+    {% for student in result %}
+        <tr>
+            <td>{{student.student}}</td>
+            <td>{{student.points}}</td>
+            <td><a class="btn btn-primary btn-sm" href="{% url 'change_group' snumber=student.student %}">Zmień grupę</a></td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock content %}

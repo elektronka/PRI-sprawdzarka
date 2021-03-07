@@ -1,40 +1,119 @@
-from rest_framework import viewsets
-from rest_framework import permissions
+import codecs, re
+from sys import stdout
 from django.shortcuts import render, redirect
-from upload import models
-from .forms import SendedTasksForm
-from .forms import TasksListForm
-from .models import SendedTasks
-from .models import TaskList
-from api import serializers
-from django.contrib.auth.models import User, Group
-from django.http import HttpResponse
+from .forms import *
+from .RabinKarp import *
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
-from .antyplagiat import *
-from .xml_metric import xmlmetricf
-from .Antyplagiat_Extended import *
-
-class StudentViewSet(viewsets.ModelViewSet):
-
-    queryset = User.objects.all()
-    serializer_class = serializers.StudentSerializer
+from django.contrib import messages
+from .models import *
+from .xml_metric import *
+from django.utils import timezone
 
 @staff_member_required(login_url='login')
+def change_points_xml(request,snumber_in_url,task_id_in_url):
+    PointsToShow=StudentsPoints.objects.filter(snumber=snumber_in_url, taskid=task_id_in_url)
+    task_to_html=StudentsPoints.objects.filter(snumber=snumber_in_url, taskid=task_id_in_url).first()
+    suma=0
+    print(task_id_in_url)
+    for point in PointsToShow:
+        suma+=point.points
+    return render(request,'upload/changepointsxml.html', {'PointsToShow':PointsToShow,'suma':suma, 'snumber':snumber_in_url, 'task_to_html':task_to_html})
+
+@staff_member_required(login_url='login')
+def change_points_xml_direct(request,snumber_in_url,task_id_in_url,number_task_in_url):
+    object=StudentsPoints.objects.get(snumber=snumber_in_url,taskid=task_id_in_url,number_task=number_task_in_url)
+    old_points=object.points
+    if request.method=='POST':
+        form = TransformersForm(request.POST)
+        if form.is_valid():         
+            object.points=form.cleaned_data['NewPoints']
+            object.save()
+            return redirect('change-points-xml', snumber_in_url=snumber_in_url, task_id_in_url=task_id_in_url )
+    else:
+        form=TransformersForm()
+    return render(request,'upload/transformers.html', {'form': form,'snumber':snumber_in_url,'zadanie':task_id_in_url, 'old_points':old_points})
+@staff_member_required(login_url='login')
 def task_sended_list(request):
-    sended=SendedTasks.objects.all()
-    return render(request,'upload/task_sended_list.html',{'sended': sended})
+    sended=SendedTasks.objects.filter( has_been_tested=False)
+    for x in sended:
+        suma=0
+        lista = ""
+        f = open(x.task.name, encoding="utf-8")
+        for line in f:
+            y = re.search(r'^<zadanie nr="(.+)" pkt="([0-9]+)">', line)
+            if y is not None:
+                temp=StudentsPoints()
+                temp.snumber=x.snumber
+                temp.taskid=x.taskid
+                temp.number_task=str(y.group(1))
+                temp.points=int(y.group(2))
+                temp.save()
+                suma+=int(y.group(2))
+        x.has_been_tested= True
+        x.save()
+        f.close()
+    sended2 = SendedTasks.objects.all()
+    return render(request,'upload/task_sended_list.html',{'sended': sended2})
+    
 
 @login_required
 def task_sended_upload(request):
     if request.method=='POST':
         form = SendedTasksForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            object = form.save(commit=False)
+            if SendedTasks.objects.filter(snumber = request.user.snumber, taskid = object.taskid).exists():
+                messages.warning(request,"Nie można dodać 2 razy tego samego zadania.")
+            elif TaskList.objects.get(id = object.taskid.id).date_end < timezone.now():
+                messages.warning(request,"Nie można oddać zadania po czasie.")
+            else:
+                if xmlmetricf(codecs.EncodedFile(request.FILES['task'],"utf-8")):
+                    object.snumber = request.user.snumber
+                    object.group = request.user.group_id
+                    object.save()
+                    messages.success(request, 'Pomyślnie oddano zadanie.')
+                else:
+                    messages.warning(request, "Niepoprawna metryczna XML.")
     else:
         form=SendedTasksForm()
     return render(request,'upload/task_sended_upload.html', {'form': form})
 
+
+def task_list(request):
+    sended=TaskList.objects.all
+    return render(request,'upload/task_List.html',{'sended': sended})
+
+def task_list_choose(request):
+    return render(request,'upload/task_list_choose.html')
+
+def task_upload_choose(request):
+    return render(request,'upload/task_upload_choose.html')
+
+def task_sended_choose(request):
+    return render(request,'upload/task_sended_choose.html')
+
+def task_student_sended_choose(request):
+    return render(request,'upload/task_student_upload_choose.html')
+
+@staff_member_required(login_url='login')
+def task_List_upload(request):
+    if request.method=='POST':
+        form = TasksListForm(request.POST, request.FILES)
+        if form.is_valid():
+            mo = re.compile(r'^[\w_\s]*$')
+            check_name = form.cleaned_data['taskname']
+            res = re.findall(mo, check_name)
+            if not res:
+                messages.warning(request, "Niepoprawna nazwa zadania.")
+            else:
+                form.save(commit=False)
+                form.tname = request.user.username
+                form.save()
+                messages.success(request, "Pomyślnie dodano zadanie!")
+    else:
+        form=TasksListForm()
+    return render(request,'upload/task_sended_upload.html', {'form': form})
 @login_required
 def read_file1(request, file_to_open):
     f = open(r'task/sendedtasks/'+file_to_open, encoding="utf-8")
@@ -44,20 +123,6 @@ def read_file1(request, file_to_open):
     f.close()
     return render(request,'upload/wyswietlanie.html',{'result': result},)
 
-def task_list(request):
-    sended=TaskList.objects.all
-    return render(request,'upload/task_List.html',{'sended': sended})
-
-@staff_member_required(login_url='login')
-def task_List_upload(request):
-    if request.method=='POST':
-        form = TasksListForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-    else:
-        form=TasksListForm()
-    return render(request,'upload/task_sended_upload.html', {'form': form})
-
 @login_required
 def read_file2(request, file_to_open):
     f = open(r'task/tasklist/'+file_to_open, encoding="utf-8")
@@ -65,204 +130,73 @@ def read_file2(request, file_to_open):
     for line in f:
         result.append(line)
     f.close()
-    return render(request,'upload/wyswietlanie.html',{'result': result})
-
-"""
-@staff_member_required(login_url='login')
-def plagiat(request):
-    result_list = []
-    file_content=""
-    Lista=[]
-    for file in SendedTasks.objects.all():
-        Lista.append(file)
-    dlug=len(Lista)
-    for i in range(dlug):
-        for j in range (i+1,dlug,1):
-            file_content = ""
-            plagiarism = ProgramFile("Bartłomiej Nowak", "434162", "15")
-            file1, file2 = plagiarism.get_file(Lista[i].task.name, Lista[j].task.name)
-            name_surname1, nr_index1, count_pkt1 = plagiarism.ReadReport(file1)
-            name_surname2, nr_index2, count_pkt2 = plagiarism.ReadReport(file2)
-            first_list, second_list = plagiarism.get_words(file1, file2)
-            text_list1, text_list2 = plagiarism.get_textlist(first_list, second_list)
-            if len(text_list1) != 0 and len(text_list2) != 0:
-                to_check, count_of_the_same_or_similar = plagiarism.check_words(text_list1, text_list2)
-                if len(text_list1) >= len(text_list2):
-                    for checked in to_check:
-                        result = plagiarism.check_the_similar_words(checked, text_list1)
-                        count_of_the_same_or_similar += result
-                    total = len(text_list1)
-                    plagiarism_coefficient = round(count_of_the_same_or_similar * 100 / total, 2)
-                else:
-                    for checked in to_check:
-                        result = plagiarism.check_the_similar_words(checked, text_list2)
-                        count_of_the_same_or_similar += result
-                    total = len(text_list2)
-                    plagiarism_coefficient = round(count_of_the_same_or_similar * 100 / total, 2)
-                if plagiarism_coefficient >= 30:
-                    file_content += str(name_surname1)+ " " +str(nr_index1) + " całkowita ilość punktów "+ str(count_pkt1) +" "+str(xmlmetricf(Lista[i].task.name))+  " | "  +str(name_surname2) + " całkowita ilość punktów "+ str(count_pkt2) +" "+ str(nr_index2) + " "+str(xmlmetricf(Lista[j].task.name)) +" | " +"Procent podobieństwa " + str(plagiarism_coefficient)
-                else:
-                    file_content += str(name_surname1)+ " " +str(nr_index1) + " całkowita ilość punktów "+ str(count_pkt1) +" "+str(xmlmetricf(Lista[i].task.name))+  " | "  +str(name_surname2) + " całkowita ilość punktów "+ str(count_pkt2) +" "+ str(nr_index2) + " "+str(xmlmetricf(Lista[j].task.name)) +" | "
-                    file_content +="Oba teksty mają "+ str(plagiarism_coefficient) + " procent podobnych słów. "
-                    file_content +="Prace są różne! Nie stwierdzam plagiatu!!"
-            else:
-                file_content +="Nie można sprawdzić plagiatu dla pustych plików"
-            result_list.append(file_content)
-    return render(request,'upload/plagiat.html', {'result_list': result_list})
-"""
+    return render(request,'upload/wyswietlanie.html',{'result': result},)
 
 @staff_member_required(login_url='login')
 def plagiat(request):
-    result_list = []
-    file_content = ""
-    Lista = []
-    for file in SendedTasks.objects.all():
-        Lista.append(file)
-    temp = []
-    for i in range(len(Lista)):
-        temp.append(Lista[i].task.name)
-    files_and_enlargement = get_file(temp)
-    for first_file in files_and_enlargement:
-        for second_file in files_and_enlargement:
-            if first_file != second_file:
-                name_of_first_file = []
-                name_of_second_file = []
-                i = len(first_file)
-                while first_file[i - 1] == '/':
-                    name_of_first_file.append(first_file[i])
-                    i = i - 1
-                name_of_first_file.reverse()
-                name_of_first_file = ''.join(str(i) for i in name_of_first_file)
-                print(name_of_first_file)
-                j = len(second_file)
-                while second_file[j - 1] == '/':
-                    name_of_second_file.append(second_file[j])
-                    j = j - 1
-                name_of_second_file.reverse()
-                name_of_second_file = ''.join(str(j) for j in name_of_second_file)
-                file_content += '\n'
-                file_content += "Sprawdzam " + str(name_of_first_file) + " i " + str(name_of_second_file)
-                file_content += '\n'
-                if files_and_enlargement[first_file] == '.txt' and files_and_enlargement[second_file] == '.txt':
-                    file1 = open(first_file, 'r', encoding="utf-8")
-                    file2 = open(second_file, 'r', encoding="utf-8")
-                    sprawozdanie = ReportFile()
-                    name1, index1, punct1 = sprawozdanie.ReadReport(file1)
-                    name2, index2, punct2 = sprawozdanie.ReadReport(file2)
-                    words1, words2 = sprawozdanie.get_words(file1, file2)
-                    text_list1, text_list2 = sprawozdanie.get_textlist(words1, words2)
-                    if len(text_list1) > 0 and len(text_list2) > 0:
-                        to_check, count_of_the_same_or_similar = sprawozdanie.check_words(text_list1, text_list2)
-                        if len(text_list1) >= len(text_list2):
-                            for checked in to_check:
-                                result = sprawozdanie.check_the_similar_words(checked, text_list1)
-                                count_of_the_same_or_similar += result
-                            total = len(text_list1)
-                            plagiarism_coefficient = round(count_of_the_same_or_similar * 100 / total, 2)
-                        else:
-                            for checked in to_check:
-                                result = sprawozdanie.check_the_similar_words(checked, text_list2)
-                                count_of_the_same_or_similar += result
-                            total = len(text_list2)
-                            plagiarism_coefficient = round(count_of_the_same_or_similar * 100 / total, 2)
-                        if plagiarism_coefficient >= 30:
-                            file_content += "Współczynnik podobieństwa tych plików to: " + str(plagiarism_coefficient) + "%"
-                            file_content += '\n'
-                            file_content += "PLAGIAT!!"
-                            file_content += '\n'
-                            file_content += "Autorzy podobnych prac:"
-                            file_content += '\n'
-                            file_content += str(name1) + " o numerze indeksu " + str(index1)
-                            file_content += '\n'
-                            file_content += str(name2) + " o numerze indeksu " + str(index2) + "|"
-                            file_content += '\n'
-                            file_content += '\n'
-                        else:
-                            file_content += "Współczynnik podobieństwa to: " + str(plagiarism_coefficient) + "%"
-                            file_content += '\n'
-                            file_content += "NIE MA PLAGIATU!!" + "|"
-                            file_content += '\n'
-                            file_content += '\n'
-                        result_list.append(file_content)
-                    else:
-                        file_content += "Nie mogę sprawdzić podobieństwa dla pustych plików lub plików z niepoprawną strukturą" + "|"
-                        file_content += '\n'
-                        file_content += '\n'
-                        result_list.append(file_content)
-
-                elif files_and_enlargement[first_file] == '.pml' and files_and_enlargement[second_file] == '.pml':
-                    file1 = open(first_file, 'r', encoding="utf-8")
-                    file2 = open(second_file, 'r', encoding="utf-8")
-                    similars = []
-                    txt = ""
-                    q = 101  # Liczba pierwsza
-                    promela = PromelaFile()
-                    words1, words2 = promela.get_words(file1, file2)
-                    if len(words1) > 0 and len(words2) > 0:
-                        if len(words1) >= len(words2):
-                            txt = " ".join([str(i) for i in words1])
-                            for word in words2:
-                                indexes = []
-                                indexes = promela.Rabin_Karp_algorithm(word, txt, q)
-                                if len(indexes) > 0:
-                                    if word not in similars:
-                                        similars.append(word)
-                                    else:
-                                        continue
-                            total = len(words1)
-                            count_of_the_same_or_similar = len(similars)
-                            plagiarism_coefficient = round(count_of_the_same_or_similar * 100 / total, 2)
-                            if plagiarism_coefficient >= 30:
-                                file_content += "Współczynnik podobieństwa tych programów to: " + str(plagiarism_coefficient) + "%"
-                                file_content += '\n'
-                                file_content += "PLAGIAT!!!" + "|"
-                                file_content += '\n'
-                                file_content += '\n'
-                            else:
-                                file_content += "Współczynnik podobieństwa to: " + str(plagiarism_coefficient) + "%"
-                                file_content += '\n'
-                                file_content += "NIE MA PLAGIATU!!" + "|"
-                                file_content += '\n'
-                                file_content += '\n'
-                            result_list.append(file_content)
-                        else:
-                            txt = " ".join([str(i) for i in words2])
-                            for word in words1:
-                                indexes = []
-                                indexes = promela.Rabin_Karp_algorithm(word, txt, q)
-                                if len(indexes) > 0:
-                                    if word not in similars:
-                                        similars.append(word)
-                                    else:
-                                        continue
-                            total = len(words2)
-                            count_of_the_same_or_similar = len(similars)
-                            plagiarism_coefficient = round(count_of_the_same_or_similar * 100 / total, 2)
-                            if plagiarism_coefficient >= 30:
-                                file_content += "Współczynnik podobieństwa tych programów to: " + str(plagiarism_coefficient) + "%"
-                                file_content += '\n'
-                                file_content += "PLAGIAT!!!" + "|"
-                                file_content += '\n'
-                                file_content += '\n'
-                            else:
-                                file_content += "Współczynnik podobieństwa to: " + str(plagiarism_coefficient) + "%"
-                                file_content += '\n'
-                                file_content += "NIE MA PLAGIATU!!" + "|"
-                                file_content += '\n'
-                                file_content += '\n'
-                            result_list.append(file_content)
-                    else:
-                        file_content += "Nie mogę sprawdzić podobieństwa plików bez kodu źródłowego programu" + "|"
-                        file_content += '\n'
-                        result_list.append(file_content)
-
-                else:
-                    file_content += "Dwa pliki muszą być tego samego rozszerzenia!!!" + "|"
-                    file_content += '\n'
-                    result_list.append(file_content)
-            else:
+    plagiaty=[]
+    files_to_check = [str(elem) for elem in list(SendedTasks.objects.filter(has_been_tested=False).values_list('task', flat=True))]
+    all_files = [str(elem) for elem in list(SendedTasks.objects.all().values_list('task', flat=True))]
+    for first_file in files_to_check:
+        for second_file in all_files:
+            if second_file == first_file:
                 continue
-            result_list.append(file_content)
-    del(file_content)
-    return render(request, 'upload/plagiat.html', {'result_list': result_list})
-
+            file1 = open(first_file, 'r', encoding="utf-8", errors="ignore")
+            file2 = open(second_file, 'r', encoding="utf-8", errors="ignore")                
+            name_surname1, nr_index1, count_pkt1 = ReadMetric(file1)
+            name_surname2, nr_index2, count_pkt2 = ReadMetric(file2)
+            words1, words2 = get_words(file1, file2)
+            text1, text2 = get_textlist(words1, words2)                    
+            not_repeat1, not_repeat2 = remove_repeat(text1, text2)
+            similars = []
+            txt = ""
+            q = 101  # Liczba pierwsza
+            if len(not_repeat1) > 0 and len(not_repeat2) > 0:
+                if len(not_repeat1) >= len(not_repeat2):
+                    txt = " ".join([str(i) for i in not_repeat1])
+                    for word in not_repeat2:
+                        indexes = []                                
+                        indexes = Rabin_Karp_algorithm(word, txt, q)
+                        if len(indexes) > 0:
+                            if word not in similars:
+                                similars.append(word)
+                            else:
+                                continue
+                    total = len(not_repeat1)
+                    count_of_the_same_or_similar = len(similars)                            
+                    plagiarism_coefficient = round(count_of_the_same_or_similar * 100 / total, 2)
+                else:
+                    txt = " ".join([str(i) for i in not_repeat2])
+                    for word in not_repeat1:
+                        indexes = []
+                        indexes = Rabin_Karp_algorithm(word, txt, q)
+                        if len(indexes) > 0:
+                            if word not in similars:
+                                similars.append(word)
+                            else:
+                                continue
+                    total = len(not_repeat2)
+                    count_of_the_same_or_similar = len(similars)
+                    plagiarism_coefficient = round(count_of_the_same_or_similar * 100 / total, 2)
+            snum1=[str(elem) for elem in list(SendedTasks.objects.filter(task = first_file).values_list('snumber', flat=True))]
+            snum2 = [str(elem) for elem in list(SendedTasks.objects.filter(task = second_file).values_list('snumber', flat=True))]
+            group_id = SendedTasks.objects.get(task = first_file)
+            plagiat = Plagiat()
+            plagiat.snumber1= snum1[0]
+            plagiat.snumber2=snum2[0]
+            plagiat.name1= first_file.lstrip('task/sendedtasks/')
+            plagiat.name2= second_file.lstrip('task/sendedtasks/')
+            plagiat.plagiat=plagiarism_coefficient
+            plagiat.group_id = int(group_id.group)
+            plagiat.save()
+        task = SendedTasks.objects.filter(task = first_file)
+        task.update(has_been_tested = True)
+    if request.method == "POST":
+        form = ChooseGroup(request.POST)
+        if form.is_valid():
+            group = form.cleaned_data['group']
+            plagiat_level = int(form.cleaned_data['plagiarism'])
+            plagiaty = Plagiat.objects.filter(group_id = group, plagiat__gt=plagiat_level)
+    else:
+        form = ChooseGroup()
+    return render(request, 'upload/plagiat.html', {'plagiaty':plagiaty,'form':form})

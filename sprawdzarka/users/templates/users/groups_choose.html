@@ -1,0 +1,8 @@
+{% extends "api/base.html" %}
+{% load crispy_forms_tags  %}
+{% block content %}
+
+        <a class="btn btn-primary btn-sm" href="{% url 'all_groups' %}">Wszystkie grupy</a>
+        <a class="btn btn-primary btn-sm" href="{% url 'active_groups' %}">Aktywne grupy</a>
+
+{% endblock content %}

@@ -1,0 +1,19 @@
+{% extends "api/base.html" %}
+{% block content %}
+    <table class="table">
+        <tr>
+            <th>taskid  </th>
+            <th>snumber  </th>
+            <th>Data zadania pytania  </th>
+            <th>Wyświetl  </th>
+        </tr>
+        {% for data in all %}
+            <tr>
+                <td>{{data.task_id }}</td>
+                <td>{{data.asking_student}}</td>
+                <td>{{data.date}}</td>
+                <td><a class="btn btn-outline-info" href="{% url 'question' choose=choose id=data.id %}">Zobacz pytanie</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

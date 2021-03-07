@@ -1,4 +1,13 @@
 {% extends "api/base.html" %}
+{% load crispy_forms_tags  %}
 {% block content %}
-    <h1>{{ user.username }}</h1>
+    <h1>Login: {{ user.username }}</h1>
+    {% if user.is_staff %}
+    {% elif user.is_authenticated  %}
+        <h1>Numer Studenta: {{ user.snumber }}</h1>
+        <h1>Grupa: {{ group.group }}</h1>
+        <h1>Liczba punktów: {{ student_points }}</h1>
+    {% endif %}
+<a class="btn btn-outline-info" href="{% url 'change-password'%}">Zmień hasło</a>
 {% endblock content %}
+

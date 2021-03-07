@@ -1,10 +1,31 @@
 {% extends "api/base.html" %}
+{% load crispy_forms_tags  %}
 {% block content %}
-
+    <form method="POST">
+        {% csrf_token %}
+        {{form|crispy}}
+        <button type="submit" class="btn btn-primary">Zatwierdź</button>
+    </form>
+            
     <h1>Osoby podejrzane o plagiat: </h1>
     <div class="plagiat">
-    {% for line in result_list%}
-    <p>{{ line }}</p>
-    {% endfor %}
+        <table>
+            <tr>
+                <th>Student podejrzany plagiat | </th>
+                <th>Student podejrzany o danie pracy | </th>
+                <th>Procent podobieństwa | </th>
+                <th>Plik plagiatu | </th>
+                <th>Plik podobnej pracy</th>
+            </tr>
+            {% for line in plagiaty %}
+                <tr>
+                    <td><center>{{ line.snumber1 }}</center></td>
+                    <td><center>{{ line.snumber2 }}</center></td>
+                    <td><center>{{ line.plagiat }}</center></td>
+                    <td><center><a class="btn btn-primary btn-sm" href="{% url 'open' file_to_open=line.name1 %}">Otwórz plik</a></center></td>
+                    <td><center><a class="btn btn-primary btn-sm" href="{% url 'open' file_to_open=line.name2 %}">Otwórz plik</a></center></td>
+                </tr>   
+            {% endfor %}
+        </table>
     </div>
 {% endblock %}
